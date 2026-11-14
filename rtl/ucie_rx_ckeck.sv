@@ -63,6 +63,33 @@ module ucie_rx_ckeck(
     assign payload_valid = ack;
 
     //--- credit ---
-    assign credit_return = ack;
+    assign credit_return = ack || nack;
+
+    //--- SVA ---
+
+    property p_payload_valid;
+        @(posedge clk) disable iff (!rst_n)
+        payload_valid |-> ack;
+    endproperty
+
+    property p_credit_return;
+        @(posedge clk) disable iff (!rst_n)
+        credit_return |-> ack;
+    endproperty
+
+    property p_nack_seq;
+        @(posedge clk) disable iff (!rst_n)
+        nack |-> (nack_seq == $past(expected_seq));
+    endproperty
+    
+
+    a_payload_valid: assert property(p_payload_valid) 
+        else $error("payload_valid is high without ack.");
+
+    a_credit_return: assert property(p_credit_return)
+        else $error("credit_return is high without ack");
+    
+    a_nack_seq: assert property(p_nack_seq)
+        else $error("nack_seq is wrong.");
 
 endmodule
