@@ -14,8 +14,12 @@ module ucie_rx_ckeck(
     input logic flit_valid,
 
     //--- output ---
+    output logic sop,
+    output logic eop,
     output logic [PAYLOAD_W-1:0] payload_out,
     output logic payload_valid,
+
+    //-- status ---
     output logic ack,
     output logic [SEQ_W-1:0] ack_seq,
     output logic nack,
@@ -59,6 +63,8 @@ module ucie_rx_ckeck(
     assign nack_seq = expected_seq;
 
     //--- payload ---
+    assign sop = flit_in.sop;
+    assign eop = flit_in.eop;
     assign payload_out = flit_in.payload;
     assign payload_valid = ack;
 

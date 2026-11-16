@@ -10,6 +10,7 @@ module tb_ucie_adaptor_v2;
 
     //--- protocol layer ---
     logic [MAX_FLITS*PAYLOAD_W-1:0] txn_payload;
+    logic [$clog2(MAX_FLITS)-1:0] txn_len;
     logic txn_valid;
     logic txn_ready;
 
@@ -41,6 +42,7 @@ module tb_ucie_adaptor_v2;
 
         //--- protocol layer ---
         .txn_payload(txn_payload),
+        .txn_len(txn_len),
         .txn_valid(txn_valid),
         .txn_ready(txn_ready),
 
@@ -70,6 +72,7 @@ module tb_ucie_adaptor_v2;
         mb_locked = 1'b0;
         corrupt_en = 1'b0;
         txn_payload = '0;
+        txn_len = 'd1;
         txn_valid = 1'b0;
 
         //--- reset ---
@@ -79,6 +82,7 @@ module tb_ucie_adaptor_v2;
         //--- no tcn_ready when active_link is zero ---
         repeat(2) @(posedge clk);
         txn_payload = 'h11223344;
+        txn_len = 'd4;
         txn_valid = 1'b1;
         corrupt_en = 1'b0;
 
@@ -100,6 +104,7 @@ module tb_ucie_adaptor_v2;
         //--- send 1 pkt without corruption ---
         repeat(2) @(posedge clk);
         txn_payload = 'h55667788;
+        txn_len = 'd4
         txn_valid = 1'b1;
         corrupt_en = 1'b0;
 
@@ -109,6 +114,7 @@ module tb_ucie_adaptor_v2;
         //--- send 1 pkt with corruption ---
         repeat(2) @(posedge clk);
         txn_payload = 'h99AABBCC;
+        txn_len = 'd4
         txn_valid = 1'b1;
         corrupt_en = 1'b1;
 
@@ -119,6 +125,7 @@ module tb_ucie_adaptor_v2;
         //--- nack storm ---
         repeat(2) @(posedge clk);
         txn_payload = 'hDDEEFF00;
+        txn_len = 'd4
         txn_valid = 1'b1;
         corrupt_en = 1'b1;
         mb_locked = 1'b0;
@@ -136,7 +143,8 @@ module tb_ucie_adaptor_v2;
 
         //--- back pressure ----
         corrupt_en = 1'b0;
-        txn_payload = 'h12345678;
+        txn_payload = 'h12;
+        txn_len = 'd1
         txn_valid = 1'b1;
         repeat(CREDIT_INIT) begin 
             txn_payload = txn_payload + 1;

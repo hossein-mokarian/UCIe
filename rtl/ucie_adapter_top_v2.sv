@@ -12,6 +12,7 @@ module ucie_adaptor_top_v2 #(
 
     //--- protocol layer ---
     input logic [MAX_FLITS*PAYLOAD_W-1:0] txn_payload,
+    input logic [$clog2(MAX_FLITS)-1:0] txn_len,
     input logic txn_valid,
     output logic txn_ready,
 
@@ -27,8 +28,10 @@ module ucie_adaptor_top_v2 #(
     input logic corrupted_en,
 
     //--- outputs ---
-    output logic [PAYLOAD_W-1:0] payload_out,
-    output logic payload_valid
+    output logic [(MAX_FLITS*PAYLOAD_W)-1:0] pkt_data,
+    output logic [$clog2(MAX_FLITS)-1:0] pkt_len,
+    output logic pkt_valid,
+    output logic pkt_error
 );
 
     logic sop;
@@ -42,6 +45,11 @@ module ucie_adaptor_top_v2 #(
 
     ucie_flit_t phy_flit_chann_out;
     logic phy_valid_chann_out;
+
+    logic rx_sop;
+    logic rx_eop;
+    logic [PAYLOAD_W-1:0] payload_out;
+    logic payload_valid;
 
     logic rx_ack;
     logic [SEQ_W-1:0] rx_ack_seq;
@@ -87,6 +95,7 @@ module ucie_adaptor_top_v2 #(
 
         //--- protocol layer ---
         .txn_payload(txn_payload),
+        .txn_len(txn_len),
         .txn_valid(txn_valid),
         .txn_reday(txn_ready),
 
@@ -170,6 +179,8 @@ module ucie_adaptor_top_v2 #(
         // .mb_locked(mb_locked), // Todo: 
 
         //--- output ---
+        .sop(rx_sop),
+        .eop(rx_eop),
         .payload_out(payload_out),
         .payload_valid(payload_valid),
         .ack(rx_ack),
@@ -177,6 +188,27 @@ module ucie_adaptor_top_v2 #(
         .nack(rx_nack),
         .nack_seq(rx_nack_seq),
         .credit_return(rx_credit_return)
+    );
+
+
+    ucie_rx_deframer rx_deframer (
+        //--- Genral ---
+        .clk(clk),
+        .rst_n(rst_n),
+
+        //--- rx ---
+        .sop(rx_sop),
+        .eop(rx_eop),
+        .payload_out(payload_out),
+        .payload_valid(payload_valid),
+
+        //--- output ---
+        .txn_data(pkt_data),
+        .txn_len(pkt_len),
+        .txn_valid(pkt_valid),
+
+        //--- status ---
+        .pkt_error(pkt_error)
     );
 
 
