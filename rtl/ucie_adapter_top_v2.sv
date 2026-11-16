@@ -34,6 +34,7 @@ module ucie_adaptor_top_v2 #(
     logic sop;
     logic eop;
     logic [PAYLOAD_W-1:0] chunk_data;
+    logic chunk_valid;
     logic ctrl_ready;
 
     logic [SEQ_W-1:0] seq_next;
@@ -93,6 +94,7 @@ module ucie_adaptor_top_v2 #(
         .sop(sop),
         .eop(eop),
         .chunk_data(chunk_data),
+        .chunk_valid(chunk_valid),
 
         //--- ctrl ---
         .ctrl_ready(ctrl_ready)
@@ -126,7 +128,7 @@ module ucie_adaptor_top_v2 #(
         .rst_n(rst_n),
 
         //--- protocol layer ---
-        .txn_valid(txn_valid),
+        .txn_valid(chunk_valid),
         .txn_ready(ctrl_ready),
 
         //--- rx ---
