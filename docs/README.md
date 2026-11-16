@@ -16,6 +16,7 @@ This repo implements the Adapter reliability core.
 
 ```
 txn_payload (Protocol shim, valid/ready)
+  -> ucie_tx_packetizer (slice payload to multi-flit)
   -> ucie_tx_framer (combinational pack: seq_in + sop/eop + payload + crc)
   -> ucie_tx_ctrl (seq_next, credits, replay_mem, replay FSM)
   -> ucie_chan (TB: FWD_LAT + corruptor) -> mainband
@@ -30,7 +31,8 @@ ucie_link_fsm -> link_active = (state == S_ACTIVE)
 ### Files
 
 * `rtl/ucie_pkg.sv` — `ucie_flit_t`, params, `calc_crc16_f()`, `ucie_link_state_e`
-* `rtl/ucie_tx_framer.sv` — combinational packer, takes `seq_in` from ctrl, `sop=1,eop=1` in v0.1
+* `rtl/ucie_tx_packetizer.sv` — slice `txn_payload`, prepare `chunk_data`, generate `sop/eop` flags, handle `txn_ready`
+* `rtl/ucie_tx_framer.sv` — combinational packer, takes `seq_in` from ctrl, `sop,eop` from packetizer
 * `rtl/ucie_tx_ctrl.sv` — owns `seq_next`, `credit_count`, `replay_buff`, replay logic
 * `rtl/ucie_rx_check.sv` — CRC + in-order check, `ACK(expected)` / `NACK(expected)`
 * `rtl/ucie_link_fsm.sv` — RESET/SBINIT/MBINIT/LINKINIT/ACTIVE/RETRAIN/LINKERROR
@@ -38,12 +40,18 @@ ucie_link_fsm -> link_active = (state == S_ACTIVE)
 * `tb/ucie_chan.sv` — delay + CRC corruptor, forward + return path
 * `tb/tb_ucie_loopback.sv` — v0.1 pass criteria tests
 
-## 3. Flit format v0.1
+## 3. Flit format
+
+### v0.1
 
 1 transaction = 1 flit. `sop=1, eop=1` always in v0.1, kept for interface stability to v0.2 multi-flit.
 
+### v0.2
+
+1 transaction = multi-flit. `sop/eop/chunk_data` comes from packetizer in v0.2.
+
 ```
-| seq[7:0] | sop(1) | eop(1) | payload[63:0] | crc[15:0] | = 90 bits total
+| seq[7:0] | sop | eop | payload[63:0] | crc[15:0] | = 90 bits total
   <----------------- crc16_f() covers ------------------->
 ```
 
