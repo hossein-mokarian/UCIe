@@ -31,7 +31,9 @@ module tb_ucie_tx;
         .clk(clk),
         .rst_n(rst_n),
 
-        //--- protocol layer ---
+        //--- slicer ---
+        .sop(1'b1),
+        .eop(1'b1),
         .txn_payload(txn_payload),
 
         //--- ctrl ---

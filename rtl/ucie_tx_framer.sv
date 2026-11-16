@@ -1,7 +1,7 @@
 
 import ucie_pkg::*;
 
-module uice_tx_framer (
+module uice_tx_framer_v1 (
     
     //--- General ----
     input logic clk,

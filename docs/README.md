@@ -115,8 +115,8 @@ Why clearing on RETRAIN corrupts: TX cleared to 0 sends seq 0, RX expects 8 -> d
 ## 8. Roadmap
 
 * v0.1: single-flit (SOP=1/EOP1). It is done.
-* v0.2: multi-flit (SOP/EOP + length), deframer reassembly FSM, separate credit_return vs ACK latency
-* v0.3: UVM env + SVA suite + coverage, sideband message protocol, v1.0 release
+* v0.2: multi-flit (SOP/EOP + length), deframer reassembly FSM, separate credit_return vs ACK latency. It is done.
+* v0.3: UVM env + SVA suite + coverage, sideband message protocol, v1.0 release. In progress.
 
 ## 9. How to run
 

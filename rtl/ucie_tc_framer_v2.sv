@@ -7,8 +7,10 @@ module uice_tx_framer (
     input logic clk,
     input logic rst_n,
 
-    //--- protocol layer ---
-    input logic [PAYLOAD_W-1:0] txn_payload,
+    //--- slicer ---
+    input logic sop,
+    input logic eop,
+    input logic [PAYLOAD_W-1:0] payload,
 
     //--- ctrl ---
     input logic [SEQ_W-1:0] seq_next,
@@ -18,9 +20,9 @@ module uice_tx_framer (
 );
 
     assign flit_out.seq = seq_next;
-    assign flit_out.sop = 1'b1;
-    assign flit_out.eop = 1'b1;
-    assign flit_out.payload = txn_payload;
+    assign flit_out.sop = sop;
+    assign flit_out.eop = eop;
+    assign flit_out.payload = payload;
     assign flit_out.crc = calc_crc16_f({flit.seq, flit.sop, flit.eop, flit.payload});
 
 

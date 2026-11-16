@@ -2,6 +2,7 @@
 package ucie_pkg;
     
     parameter int PAYLOAD_W         = 64;
+    parameter int MAX_FLITS         = 4;
     parameter int SEQ_W             = 8;
     parameter int CRC_w             = 16;
     parameter int CREDIT_INIT       = 10;

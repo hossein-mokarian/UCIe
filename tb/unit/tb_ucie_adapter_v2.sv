@@ -1,6 +1,6 @@
 import ucie_pkg::*;
 
-module tb_ucie_loopback;
+module tb_ucie_adaptor_v2;
 
     localparam int REPLAY_BUFF_W = CREDIT_INIT;
     localparam int CNT_W = 5;
@@ -9,7 +9,7 @@ module tb_ucie_loopback;
     logic rst_n;
 
     //--- protocol layer ---
-    logic [PAYLOAD_W-1:0] txn_payload;
+    logic [MAX_FLITS*PAYLOAD_W-1:0] txn_payload;
     logic txn_valid;
     logic txn_ready;
 
@@ -29,7 +29,7 @@ module tb_ucie_loopback;
     logic payload_valid;
 
 
-    ucie_adaptor_top #(
+    ucie_adapt0r_top_v2 #(
         .REPLAY_BUFF_W(REPLAY_BUFF_W),
         .CNT_W(CNT_W),
         .TX_CH_DELAY(TX_CH_DELAY),
@@ -78,7 +78,7 @@ module tb_ucie_loopback;
 
         //--- no tcn_ready when active_link is zero ---
         repeat(2) @(posedge clk);
-        txn_payload = 'h55;
+        txn_payload = 'h11223344;
         txn_valid = 1'b1;
         corrupt_en = 1'b0;
 
@@ -97,18 +97,18 @@ module tb_ucie_loopback;
         @(posedge clk)
         mb_locked = 1'b0;
 
-        //--- send 1 flit without corruption ---
+        //--- send 1 pkt without corruption ---
         repeat(2) @(posedge clk);
-        txn_payload = 'h55;
+        txn_payload = 'h55667788;
         txn_valid = 1'b1;
         corrupt_en = 1'b0;
 
         while(!txn_ready) @(posedge clk);
         txn_valid = 1'b0;
 
-        //--- send 1 flit with corruption ---
+        //--- send 1 pkt with corruption ---
         repeat(2) @(posedge clk);
-        txn_payload = 'h66;
+        txn_payload = 'h99AABBCC;
         txn_valid = 1'b1;
         corrupt_en = 1'b1;
 
@@ -118,7 +118,7 @@ module tb_ucie_loopback;
 
         //--- nack storm ---
         repeat(2) @(posedge clk);
-        txn_payload = 'h77;
+        txn_payload = 'hDDEEFF00;
         txn_valid = 1'b1;
         corrupt_en = 1'b1;
         mb_locked = 1'b0;
@@ -136,7 +136,7 @@ module tb_ucie_loopback;
 
         //--- back pressure ----
         corrupt_en = 1'b0;
-        txn_payload = 'h00;
+        txn_payload = 'h12345678;
         txn_valid = 1'b1;
         repeat(CREDIT_INIT) begin 
             txn_payload = txn_payload + 1;
@@ -147,8 +147,8 @@ module tb_ucie_loopback;
     end
     
     initial begin
-        $dumpfile("tb_ucie_adaptor.vcd");
-        $dumvars(0, tb_ucie_adaptor);
+        $dumpfile("tb_ucie_adaptor_v2.vcd");
+        $dumvars(0, tb_ucie_adaptor_v2);
     end    
 
 endmodule

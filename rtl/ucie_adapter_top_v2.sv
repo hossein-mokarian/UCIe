@@ -1,6 +1,6 @@
 import ucie_pkg::*;
 
-module ucie_top #(
+module ucie_adaptor_top_v2 #(
     parameter int REPLAY_BUFF_W = CREDIT_INIT,
     parameter int CNT_W = 5,
     parameter int TX_CH_DELAY = 2,
@@ -11,7 +11,7 @@ module ucie_top #(
     input logic rst_n,
 
     //--- protocol layer ---
-    input logic [PAYLOAD_W-1:0] txn_payload,
+    input logic [MAX_FLITS*PAYLOAD_W-1:0] txn_payload,
     input logic txn_valid,
     output logic txn_ready,
 
@@ -30,6 +30,11 @@ module ucie_top #(
     output logic [PAYLOAD_W-1:0] payload_out,
     output logic payload_valid
 );
+
+    logic sop;
+    logic eop;
+    logic [PAYLOAD_W-1:0] chunk_data;
+    logic ctrl_ready;
 
     logic [SEQ_W-1:0] seq_next;
     ucie_flit_t new_flit;
@@ -71,13 +76,38 @@ module ucie_top #(
     );
 
 
+    ucie_tx_packetizer tx_packetizer (
+        //--- Genral ---
+        .clk(clk),
+        .rst_n(rst_n),
+
+        //--- status ---
+        .link_active(link_active),
+
+        //--- protocol layer ---
+        .txn_payload(txn_payload),
+        .txn_valid(txn_valid),
+        .txn_reday(txn_ready),
+
+        //--- chunk data ---
+        .sop(sop),
+        .eop(eop),
+        .chunk_data(chunk_data),
+
+        //--- ctrl ---
+        .ctrl_ready(ctrl_ready)
+    );
+
+
     uice_tx_framer tx_framer (
         //--- General ----
         .clk(clk),
         .rst_n(rst_n),
 
-        //--- protocol layer ---
-        .txn_payload(txn_payload),
+        //--- slicer ---
+        .sop(sop),
+        .eop(eop),
+        .txn_payload(chunk_data),
 
         //--- ctrl ---
         .seq_next(seq_next),
@@ -97,7 +127,7 @@ module ucie_top #(
 
         //--- protocol layer ---
         .txn_valid(txn_valid),
-        .txn_ready(txn_ready),
+        .txn_ready(ctrl_ready),
 
         //--- rx ---
         .ack(rx_ack_chann),
@@ -179,6 +209,5 @@ module ucie_top #(
         //--- crtl ---
         .corrupt_en(corrupt_en)
     );
-
 
 endmodule
