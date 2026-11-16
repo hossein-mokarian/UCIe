@@ -33,7 +33,7 @@ module ucie_rx_ckeck(
 
 
     //--- crc ---
-    assign expected_crc = crc_calc({flit_in.seq, flit_in.sop, flit_in.eop, flit_in.payload});
+    assign expected_crc = calc_crc16_f({flit_in.seq, flit_in.sop, flit_in.eop, flit_in.payload});
     assign crc_valid = (flit_in.crc == expected_crc);
 
     //--- activation ---
@@ -63,7 +63,7 @@ module ucie_rx_ckeck(
     assign payload_valid = ack;
 
     //--- credit ---
-    assign credit_return = ack || nack;
+    assign credit_return = ack; // ack || nack; // Todo:
 
     //--- SVA ---
 

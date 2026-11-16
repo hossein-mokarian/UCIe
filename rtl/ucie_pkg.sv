@@ -15,7 +15,7 @@ package ucie_pkg;
         logic [CRC_w - 1 : 0] crc;
     } ucie_flit_t;
 
-    function automatic logic [CRC_w - 1 : 0] crc_calc(logic [SEQ_W + 2 + PAYLOAD_W - 1 : 0] d);
+    function automatic logic [CRC_w - 1 : 0] calc_crc16_f(logic [SEQ_W + 2 + PAYLOAD_W - 1 : 0] d);
         logic [15:0] c = 16'hFFFF;
 
         for (int i = $bits(d) - 1; i >= 0; i--) begin
@@ -33,6 +33,6 @@ package ucie_pkg;
         S_LINKINIT,
         S_ACTIVE,
         S_RETRAIN
-    } ucie_link_state_t;
+    } ucie_link_state_e;
 
 endpackage

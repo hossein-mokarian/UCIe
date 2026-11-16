@@ -31,7 +31,7 @@ module uice_tx_framer (
     assign flit_out.sop = 1'b1;
     assign flit_out.eop = 1'b1;
     assign flit_out.payload = (txn_ready && txn_valid) ? txn_payload : '0;
-    assign flit_out.crc = crc_calc({flit.seq, flit.sop, flit.eop, flit.payload});
+    assign flit_out.crc = calc_crc16_f({flit.seq, flit.sop, flit.eop, flit.payload});
 
     assign flit_valid = flit_sent;
 
@@ -78,7 +78,7 @@ module uice_tx_framer (
 
     property p_crc_valid;
         @(posedge clk) disable iff (!rst_n)
-        flit_valid |-> (flit_out.crc == crc_calc({flit_out.seq, flit_out.sop, flit_out.eop, flit_out.payload}));
+        flit_valid |-> (flit_out.crc == calc_crc16_f({flit_out.seq, flit_out.sop, flit_out.eop, flit_out.payload}));
     endproperty
 
     a_ready_when_active_link_cerditgrant: assert property(p_ready_when_active_link_cerditgrant)

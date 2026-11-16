@@ -20,7 +20,7 @@ module ucie_tx_ctrl #(
     input logic credit_return,
 
     //--- tx framer ---
-    output [SEQ_W-1:0] seq_num,
+    output [SEQ_W-1:0] seq_next,
     input ucie_flit_t new_flit,
 
     //--- phy ---
@@ -85,21 +85,17 @@ module ucie_tx_ctrl #(
         end
     end
 
-    assign seq_num = seq;
+    assign seq_next = seq;
 
 
     //--- credit counter ---
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             credit_count <= CREDIT_INIT;
-        end else if (state != S_IDLE) begin
-            if (credit_return) begin
-                credit_count <= credit_count + 1;
-            end
-            
-            if (credit_count > 0 && phy_valid) begin
-                credit_count <= credit_count - 1;
-            end
+        end else if ((state == S_NEW_FLIT) && (credit_count > 0) && phy_valid) begin
+            credit_count <= credit_count - 1 + (credit_count ? 1'b1 : 1'b0);
+        end if ((state != S_IDLE) && credit_return) begin
+            credit_count <= credit_count + 1;
         end
     end
 
@@ -129,7 +125,7 @@ module ucie_tx_ctrl #(
 
 
     //--- protocol layer ---
-    assign txn_ready = link_active && credit_grant && new_flit_mode;
+    assign txn_ready = new_flit_mode ? (link_active && credit_grant && new_flit_mode) : 1'b0;
 
 
     //--- phy ---
