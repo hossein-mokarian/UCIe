@@ -1,4 +1,4 @@
-# UCIe Adapter Controller — Subset Implementation (v0.1 single-flit)
+# UCIe Adapter Controller
 
 A SystemVerilog implementation of the UCIe Adapter-layer digital core: framing, sequencing, CRC, credit-based flow control, go-back-N replay, and link training FSM.
 
