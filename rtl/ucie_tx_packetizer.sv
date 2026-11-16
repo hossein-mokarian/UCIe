@@ -17,6 +17,7 @@ module ucie_tx_packetizer(
     output logic sop,
     output logic eop,
     output logic [PAYLOAD_W-1:0] chunk_data,
+    output logic chunk_valid,
 
     //--- ctrl ---
     input logic ctrl_ready
@@ -75,6 +76,7 @@ module ucie_tx_packetizer(
 
     
     assign chunk_data = payload[((flit_cnt + 1)*PAYLOAD_W-1) : (flit_cnt*PAYLOAD_W)];
+    assign chunk_valid = (status != S_PT_IDLE);
 
 
     assign txn_reday = ctrl_ready && (state == S_PT_EOP);
