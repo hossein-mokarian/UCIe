@@ -24,7 +24,7 @@ module ucie_tx_packetizer(
     input logic ctrl_ready
 );
 
-    typedef enum logic[2:0] { 
+    typedef enum logic[1:0] { 
         S_PT_IDLE,
         S_PT_SOP,
         S_PT_IN_PKT,

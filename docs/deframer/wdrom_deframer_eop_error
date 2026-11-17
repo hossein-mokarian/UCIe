@@ -1,0 +1,18 @@
+{signal: [
+  {name: 'clk',           wave: 'p.....|.'},
+  {name: 'payload',       wave: 'x3555x',  data:['A','B','C','D']},
+  {name: 'payload_valid', wave: '011110'},
+  {name: 'sop',           wave: '010000'},
+  {name: 'eop',           wave: '011010'},
+  {name: 'state',         wave: 'x33333', data:['WAIT','WAIT','WAIT','WAIT', 'WAIT']},
+  {name: 'start_flit',    wave: '00000'},
+  {name: 'collecct_flit', wave: '00000'},
+  {name: 'last_flit',     wave: '00000'},
+  {name: 'single_flit',   wave: '01000'},
+  {name: 'flit_cnt',      wave: '444444',  data:['0','0','0','0','0','0']},
+  {name: 'sr_data',       wave: '003555', data:['00A', '0AB', 'ABC', 'BCD']},
+  {name: 'txn_data',      wave: '03555',  data:['xxxA','xxxB', 'xxxC', 'xxxD']},
+  {name: 'txn_len',       wave: '44444',   data:['0','1','0','0','0','0']},
+  {name: 'txn_valid',     wave: '01000'},
+  {name: 'pkt_error',     wave: '00101'},
+]}

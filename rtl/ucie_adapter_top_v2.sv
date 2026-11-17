@@ -199,7 +199,7 @@ module ucie_adaptor_top_v2 #(
         //--- rx ---
         .sop(rx_sop),
         .eop(rx_eop),
-        .payload_out(payload_out),
+        .payload(payload_out),
         .payload_valid(payload_valid),
 
         //--- output ---
